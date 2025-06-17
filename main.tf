@@ -157,17 +157,14 @@ resource "google_cloud_run_v2_service" "loader-service" {
   template {
     containers {
       image                     = "${local.repository_path}/${local.loader_service}:latest"
-      env {
-        name                    = "PROJECT_ID"
-        value                   = var.application_project_id
-      }
-      env {
-        name                    = "DATA_STORE_ID"
-        value                   = local.data_store_id
-      }
-      env {
-        name                    = "GCS_URI"
-        value                   = local.documents_uri
+
+      # Environment variables
+      dynamic "env" {
+        for_each = var.environment_variables
+        content {
+          name  = env.key
+          value = env.value
+        }
       }
     }
   }
